@@ -121,7 +121,7 @@ else
   echo "==> [Update] System already provisioned. Skipping installs."
 
   # Pull latest code
-  echo "==> [Update] Pulling latest code..."
+  echo "==> [Update] Pulling latest code...."
   cd "$APP_PATH"
   git pull origin main || git pull origin master
 fi
@@ -142,4 +142,4 @@ echo "==> Reloading services..."
 systemctl reload php8.3-fpm || systemctl restart php8.3-fpm
 systemctl reload nginx || systemctl restart nginx
 
-echo "==> Deployment finished successfully!"
+echo "==> Deployment finished successfully!!"
