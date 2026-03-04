@@ -48,3 +48,9 @@ variable "app_key" {
   type        = string
   default     = ""
 }
+
+variable "db_dump_path" {
+  description = "Optional: local path to a .sql dump file to import on first run. Leave empty to skip."
+  type        = string
+  default     = ""
+}

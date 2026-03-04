@@ -7,3 +7,4 @@ db_name     = "new-loan"
 db_user     = "root"
 db_password = "password"
 app_key     = "" # Leave empty to generate automatically
+db_dump_path = "./configs/new-loan.sql"
