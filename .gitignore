@@ -18,3 +18,6 @@ yarn-error.log
 /.idea
 /.vscode
 install/database.sql
+deploy/terraform/.terraform/*
+deploy/terraform/.terraform.lock.hcl
+deploy/terraform/terraform.tfstate

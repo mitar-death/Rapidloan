@@ -1,0 +1,128 @@
+#!/bin/bash
+set -e
+
+# Variables passed from Terraform
+DB_NAME="${db_name}"
+DB_USER="${db_user}"
+DB_PASS="${db_password}"
+DOMAIN="${domain}"
+GIT_REPO="${git_repo}"
+APP_KEY="${app_key}"
+
+APP_PATH="/var/www/project"
+PMA_PATH="/var/www/phpmyadmin"
+SENTINEL="/etc/deploy/.provisioned"
+MYSQL_CMD="mysql -uroot -p$DB_PASS"
+
+echo "==> Starting deployment on $DOMAIN..."
+
+# ─────────────────────────────────────────────────────────────
+# FIRST RUN — install & configure everything
+# ─────────────────────────────────────────────────────────────
+if [ ! -f "$SENTINEL" ]; then
+  echo "==> [First run] Installing system packages..."
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y nginx php8.3-fpm php8.3-mysql php8.3-common php8.3-curl \
+    php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-sqlite3 php8.3-gmp \
+    mariadb-server mariadb-client git unzip curl
+
+  # Start and enable MySQL/MariaDB
+  echo "==> [First run] Configuring MariaDB..."
+  systemctl start mariadb
+  systemctl enable mariadb
+
+  # Secure MySQL (handles both fresh install with no password and re-run)
+  mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_PASS'; FLUSH PRIVILEGES;" 2>/dev/null || \
+      mysql -uroot -p"$DB_PASS" -e "SELECT 1;" 2>/dev/null || true
+  $MYSQL_CMD -e "DELETE FROM mysql.user WHERE User='';"
+  $MYSQL_CMD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  $MYSQL_CMD -e "DROP DATABASE IF EXISTS test;"
+  $MYSQL_CMD -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';"
+  $MYSQL_CMD -e "FLUSH PRIVILEGES;"
+
+  # Install Composer
+  if ! command -v composer &> /dev/null; then
+    echo "==> [First run] Installing Composer..."
+    apt-get install -y composer
+  fi
+
+  # Setup Database
+  echo "==> [First run] Creating database and user..."
+  $MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
+  $MYSQL_CMD -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';"
+  $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost';"
+  $MYSQL_CMD -e "FLUSH PRIVILEGES;"
+
+  # Clone repository
+  if [ -d "$APP_PATH" ]; then
+    echo "==> [First run] Repository already exists. Skipping clone."
+    
+  else
+    echo "==> [First run] Cloning repository..."
+    git clone "$GIT_REPO" "$APP_PATH"
+  fi
+
+  # Setup .env
+  echo "==> [First run] Creating .env..."
+  cd "$APP_PATH"
+  cp .env.example .env
+  sed -i "s/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/" .env
+  sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_NAME/" .env
+  sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USER/" .env
+  sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
+  sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
+  if [ -z "$APP_KEY" ]; then
+    php artisan key:generate
+  else
+    sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
+  fi
+
+  echo "==> [First run] Installing dependencies..."
+  cd "$APP_PATH"
+  composer install --no-interaction --prefer-dist --optimize-autoloader
+
+
+  # Setup phpMyAdmin
+  echo "==> [First run] Installing phpMyAdmin..."
+  mkdir -p "$PMA_PATH"
+  cd /tmp
+  curl -L https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz -o pma.tar.gz
+  tar xzf pma.tar.gz --strip-components=1 -C "$PMA_PATH"
+  rm pma.tar.gz
+  chown -R www-data:www-data "$PMA_PATH"
+
+  # Mark as provisioned
+  mkdir -p /etc/deploy
+  touch "$SENTINEL"
+  echo "==> [First run] System provisioning complete."
+
+else
+  echo "==> [Update] System already provisioned. Skipping installs."
+
+  # Pull latest code
+  echo "==> [Update] Pulling latest code..."
+  cd "$APP_PATH"
+  git pull origin main || git pull origin master
+fi
+
+# ─────────────────────────────────────────────────────────────
+# ALWAYS RUN — runs on every apply (first run + updates)
+# ─────────────────────────────────────────────────────────────
+echo "==> Updating application..."
+cd "$APP_PATH"
+
+chown -R www-data:www-data "$APP_PATH"
+chmod -R 775 storage bootstrap/cache
+
+composer install --no-interaction --prefer-dist --optimize-autoloader
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+echo "==> Reloading services..."
+systemctl reload php8.3-fpm || systemctl restart php8.3-fpm
+systemctl reload nginx || systemctl restart nginx
+
+echo "==> Deployment finished successfully!"

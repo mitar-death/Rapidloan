@@ -1,0 +1,9 @@
+vps_ip      = "185.212.128.239"
+ssh_user    = "root"
+ssh_pass    = "cE6BSU*j-^RQeVV"
+domain      = "yournetinvestment.com"
+git_repo    = "https://github.com/mitar-death/Rapidloan.git"
+db_name     = "new-loan"
+db_user     = "root"
+db_password = "password"
+app_key     = "" # Leave empty to generate automatically
