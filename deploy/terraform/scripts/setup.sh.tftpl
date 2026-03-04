@@ -91,7 +91,7 @@ if [ ! -f "$SENTINEL" ]; then
   sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
   sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
 
-  echo "==> [First run] Installing dependencies..."
+  echo "==> [First run] Installing dependencies...."
   cd "$APP_PATH"
   composer install --no-interaction --prefer-dist --optimize-autoloader
   
