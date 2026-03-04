@@ -23,3 +23,4 @@ deploy/terraform/.terraform.lock.hcl
 deploy/terraform/terraform.tfstate
 deploy/terraform/terraform.tfstate.backup
 deploy/terraform/configs/new-loan.sql
+./.DS_Store
