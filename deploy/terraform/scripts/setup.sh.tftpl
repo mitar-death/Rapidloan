@@ -28,12 +28,12 @@ fi
 # FIRST RUN — install & configure everything
 # ─────────────────────────────────────────────────────────────
 if [ ! -f "$SENTINEL" ]; then
-  echo "==> [First run] Installing system packages..."
+  echo "==> [First run] Installing system packages...."
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
   apt-get install -y nginx php8.3-fpm php8.3-mysql php8.3-common php8.3-curl \
     php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-sqlite3 php8.3-gmp \
-    mariadb-server mariadb-client git unzip curl
+    mariadb-server mariadb-client git unzip curl nano
 
   # Start and enable MySQL/MariaDB
   echo "==> [First run] Configuring MariaDB..."
@@ -89,7 +89,20 @@ if [ ! -f "$SENTINEL" ]; then
   sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_NAME/" .env
   sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USER/" .env
   sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
-  sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
+  if [ "${has_ssl}" = "true" ]; then
+    sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|" .env
+    # Ensure session cookies are secure when using SSL
+    if grep -q "SESSION_SECURE_COOKIE" .env; then
+      sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=true/" .env
+    else
+      echo "SESSION_SECURE_COOKIE=true" >> .env
+    fi
+  else
+    sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
+    if grep -q "SESSION_SECURE_COOKIE" .env; then
+      sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=false/" .env
+    fi
+  fi
 
   echo "==> [First run] Installing dependencies...."
   cd "$APP_PATH"
@@ -134,12 +147,10 @@ cd "$APP_PATH"
 
 chown -R www-data:www-data "$APP_PATH"
 chmod -R 775 storage bootstrap/cache
-
-composer install --no-interaction --prefer-dist --optimize-autoloader
 php artisan migrate --force
 
 echo "==> Reloading services..."
 systemctl reload php8.3-fpm || systemctl restart php8.3-fpm
 systemctl reload nginx || systemctl restart nginx
 
-echo "==> Deployment finished successfully!!"
+echo "==> Deployment finished successfully!.!"

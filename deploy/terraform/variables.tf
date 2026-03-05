@@ -54,3 +54,21 @@ variable "db_dump_path" {
   type        = string
   default     = ""
 }
+
+variable "ssl_cert_path" {
+  description = "Path to the SSL certificate file"
+  type        = string
+  default     = "./configs/certificate.pem"
+}
+
+variable "ssl_key_path" {
+  description = "Path to the SSL private key file"
+  type        = string
+  default     = "./configs/private_key.pem"
+}
+
+variable "nginx_reconfig_trigger" {
+  description = "Change this value to trigger Nginx reconfiguration"
+  type        = string
+  default     = ""
+}

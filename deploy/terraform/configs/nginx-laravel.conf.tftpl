@@ -1,6 +1,18 @@
 server {
     listen 80;
-    server_name ${domain};
+%{ if has_ssl ~}
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/ssl/certificate.pem;
+    ssl_certificate_key /etc/nginx/ssl/private_key.pem;
+
+    # Fix for "too many redirects" when using Cloudflare Flexible SSL
+    # Only redirect if the request is NOT already forwarded as HTTPS
+    if ($http_x_forwarded_proto != "https") {
+        rewrite ^ https://$host$request_uri? permanent;
+    }
+%{ endif ~}
+
+    server_name ${domain} www.${domain};
     root /var/www/project/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -23,6 +35,14 @@ server {
         fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
+        
+        # Security and Proxy Headers
+        fastcgi_param HTTP_PROXY "";
+        fastcgi_param HTTP_X_FORWARDED_PROTO $scheme;
+        if ($http_x_forwarded_proto = "https") {
+            set $fe_https "on";
+        }
+        fastcgi_param HTTPS $fe_https if_not_empty;
     }
 
     location ~ /\.(?!well-known).* {
