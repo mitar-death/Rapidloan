@@ -1,0 +1,6 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 65L30 25L45 50L55 35L75 65H10Z" fill="black"/>
+  <circle cx="65" cy="25" r="8" fill="black"/>
+  <text x="90" y="52" font-family="Georgia, serif" font-weight="bold" font-size="24" fill="black">SUMMIT</text>
+  <text x="90" y="70" font-family="Georgia, serif" font-style="italic" font-size="14" fill="black">Equity Group</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <path d="M15 15L35 65L55 15H45L35 45L25 15H15Z" fill="black"/>
+  <path d="M35 75C35 75 10 60 10 30V10H60V30C60 60 35 75 35 75Z" fill="none" stroke="black" stroke-width="2"/>
+  <text x="70" y="52" font-family="Impact, sans-serif" font-size="28" fill="black">VANGUARD</text>
+  <text x="70" y="70" font-family="Impact, sans-serif" font-size="12" letter-spacing="3" fill="black">PARTNERS</text>
+</svg>

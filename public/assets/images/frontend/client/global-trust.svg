@@ -1,0 +1,7 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="35" cy="40" r="25" fill="none" stroke="black" stroke-width="2"/>
+  <path d="M35 15V65M10 40H60" stroke="black" stroke-width="1.5" fill="none"/>
+  <path d="M25 20Q35 40 25 60M45 20Q35 40 45 60" stroke="black" stroke-width="1.5" fill="none"/>
+  <text x="75" y="45" font-family="Arial, sans-serif" font-weight="bold" font-size="20" fill="black">GLOBALTRUST</text>
+  <text x="75" y="62" font-family="Arial, sans-serif" font-size="10" letter-spacing="2" fill="black">BANKING PARTNER</text>
+</svg>

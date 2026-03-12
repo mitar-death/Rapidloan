@@ -1,0 +1,6 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 60L35 15L60 60H50L35 30L20 60H10Z" fill="black"/>
+  <path d="M35 45L45 65H25L35 45Z" fill="black"/>
+  <text x="75" y="52" font-family="Verdana, sans-serif" font-weight="900" font-size="26" fill="black">APEX</text>
+  <text x="75" y="70" font-family="Verdana, sans-serif" font-size="12" fill="black">FINTECH SOLUTIONS</text>
+</svg>

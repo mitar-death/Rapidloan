@@ -1,0 +1,6 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <path d="M20 60V20L40 45V60H20Z" fill="black"/>
+  <path d="M45 20V60L25 35V20H45Z" fill="black"/>
+  <text x="60" y="52" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="black">NEXUS</text>
+  <text x="60" y="70" font-family="Arial, sans-serif" font-size="12" fill="black">CAPITAL</text>
+</svg>

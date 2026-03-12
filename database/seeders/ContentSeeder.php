@@ -327,13 +327,12 @@ class ContentSeeder extends Seeder
         // 15. Realistic Client Logos
         Frontend::where('data_keys', 'client.element')->delete();
         $clientLogos = [
-            'https://images.unsplash.com/photo-1614028674026-6329139d441e?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1599305090598-fe179d501c27?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1583608205776-bfd35f0d9fd6?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1615915468310-720c788ed07a?w=200&h=200&fit=crop&q=80',
-            'https://images.unsplash.com/photo-1618111516067-12bd40294fc9?w=200&h=200&fit=crop&q=80'
+            'nexus-capital.svg',
+            'global-trust.svg',
+            'apex-fintech.svg',
+            'summit-equity.svg',
+            'vanguard-partners.svg',
+            'quantum-systems.svg'
         ];
 
         foreach ($clientLogos as $logo) {
@@ -346,5 +345,14 @@ class ContentSeeder extends Seeder
                 ]
             ]);
         }
+        // 16. Footer Content
+        Frontend::updateOrCreate(['data_keys' => 'footer.content', 'tempname' => 'basic'], [
+            'data_values' => [
+                'title' => 'About Your Net Investment',
+                'description' => 'Your Net Investment is committed to providing accessible and transparent financial solutions. We empower individuals and businesses to reach their goals through flexible borrowing options and expert support.',
+                'subscription_heading' => 'Newsletter',
+                'subscription_subheading' => 'Stay Informed and Never Miss a Beat: Subscribe to Our Loan Updates'
+            ]
+        ]);
     }
 }
