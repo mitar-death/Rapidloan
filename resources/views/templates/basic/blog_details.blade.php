@@ -52,7 +52,7 @@
                                             <div class="d-flex pb-3">
                                                 <div class="me-3 flex-shrink-0">
                                                     <div class="blog-thumb">
-                                                        <img src="{{ frontendImage('blog' , 'thumb_' . @$blog->data_values->image, '430x225') }}" />
+                                                        <img src="{{ frontendImage('blog', (filter_var(@$blog->data_values->image, FILTER_VALIDATE_URL) ? @$blog->data_values->image : 'thumb_' . @$blog->data_values->image), '430x225') }}" />
                                                     </div>
                                                 </div>
                                                 <div class="article">

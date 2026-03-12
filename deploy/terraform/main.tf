@@ -20,7 +20,10 @@ resource "null_resource" "upload_db_dump" {
 }
 
 locals {
-  has_ssl = fileexists(var.ssl_cert_path) && fileexists(var.ssl_key_path)
+  has_ssl = (
+    var.ssl_cert_path != "" && var.ssl_key_path != "" &&
+    try(fileexists(var.ssl_cert_path), false) && try(fileexists(var.ssl_key_path), false)
+  )
 }
 
 resource "null_resource" "upload_ssl_certs" {
@@ -137,5 +140,7 @@ resource "null_resource" "nginx_config" {
     ssl_cert               = local.has_ssl ? filesha1(var.ssl_cert_path) : "no-ssl"
     ssl_key                = local.has_ssl ? filesha1(var.ssl_key_path) : "no-ssl"
     nginx_reconfig_trigger = var.nginx_reconfig_trigger
+    # Always re-run nginx config on every apply
+    always_run = timestamp()
   }
 }

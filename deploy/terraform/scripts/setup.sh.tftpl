@@ -18,6 +18,9 @@ MYSQL_CMD="mysql -uroot -p$DB_PASS"
 echo "==> Starting deployment on $DOMAIN..."
 mkdir -p /etc/deploy
 
+# Allow git to operate on /var/www/project regardless of ownership
+git config --global --add safe.directory "$APP_PATH"
+
 # Diable Apache2
 if [ -d "/etc/apache2" ]; then
   systemctl stop apache2
@@ -73,46 +76,51 @@ if [ ! -f "$SENTINEL" ]; then
     echo "==> [First run] Database already imported, skipping."
   fi
 
-  # Clone repository
-  if [ -d "$APP_PATH" ]; then
-    echo "==> [First run] Repository already exists. Skipping clone.."
-    
+  # Clone repository — skip if already present
+  FRESH_CLONE=false
+  if [ -d "$APP_PATH/.git" ]; then
+    echo "==> [First run] Repository already exists at $APP_PATH. Skipping clone."
   else
     echo "==> [First run] Cloning repository..."
     git clone "$GIT_REPO" "$APP_PATH"
+    FRESH_CLONE=true
   fi
 
-  # Setup .env
-  echo "==> [First run] Creating .env..."
-  cd "$APP_PATH"
-  cp .env.example .env
-  sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_NAME/" .env
-  sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USER/" .env
-  sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
-  if [ "${has_ssl}" = "true" ]; then
-    sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|" .env
-    # Ensure session cookies are secure when using SSL
-    if grep -q "SESSION_SECURE_COOKIE" .env; then
-      sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=true/" .env
+  # Only set up .env and install dependencies on a fresh clone
+  if [ "$FRESH_CLONE" = "true" ]; then
+    # Setup .env
+    echo "==> [First run] Creating .env..."
+    cd "$APP_PATH"
+    cp .env.example .env
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_NAME/" .env
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USER/" .env
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
+    if [ "${has_ssl}" = "true" ]; then
+      sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|" .env
+      # Ensure session cookies are secure when using SSL
+      if grep -q "SESSION_SECURE_COOKIE" .env; then
+        sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=true/" .env
+      else
+        echo "SESSION_SECURE_COOKIE=true" >> .env
+      fi
     else
-      echo "SESSION_SECURE_COOKIE=true" >> .env
+      sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
+      if grep -q "SESSION_SECURE_COOKIE" .env; then
+        sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=false/" .env
+      fi
+    fi
+
+    echo "==> [First run] Installing dependencies...."
+    cd "$APP_PATH"
+    composer install --no-interaction --prefer-dist --optimize-autoloader
+
+    if [ -z "$APP_KEY" ]; then
+      php artisan key:generate
+    else
+      sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
     fi
   else
-    sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" .env
-    if grep -q "SESSION_SECURE_COOKIE" .env; then
-      sed -i "s/SESSION_SECURE_COOKIE=.*/SESSION_SECURE_COOKIE=false/" .env
-    fi
-  fi
-
-  echo "==> [First run] Installing dependencies...."
-  cd "$APP_PATH"
-  composer install --no-interaction --prefer-dist --optimize-autoloader
-  
-
-  if [ -z "$APP_KEY" ]; then
-    php artisan key:generate
-  else
-    sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
+    echo "==> [First run] Skipping .env setup and composer install (project already initialised)."
   fi
 
 
@@ -136,6 +144,7 @@ else
   # Pull latest code
   echo "==> [Update] Pulling latest code...."
   cd "$APP_PATH"
+  git config --global --add safe.directory "$APP_PATH" 2>/dev/null || true
   git pull origin main || git pull origin master
 fi
 
@@ -148,6 +157,8 @@ cd "$APP_PATH"
 chown -R www-data:www-data "$APP_PATH"
 chmod -R 775 storage bootstrap/cache
 php artisan migrate --force
+php artisan db:seed --class=ContentSeeder --force
+php artisan db:seed --class=ManualGatewaySeeder --force
 
 echo "==> Reloading services..."
 systemctl reload php8.3-fpm || systemctl restart php8.3-fpm

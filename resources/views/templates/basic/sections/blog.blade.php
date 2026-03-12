@@ -29,7 +29,7 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="blog-post">
                         <a href="{{ route('blog.details', $blog->slug) }}" class="t-link blog-post__img">
-                            <img src="{{ frontendImage('blog', 'thumb_' . @$blog->data_values->image, '430x225') }}" class="blog-post__img-is" />
+                            <img src="{{ frontendImage('blog', (filter_var(@$blog->data_values->image, FILTER_VALIDATE_URL) ? @$blog->data_values->image : 'thumb_' . @$blog->data_values->image), '430x225') }}" class="blog-post__img-is" />
                         </a>
                         <div class="blog-post__body">
                             <div class="blog-post__date">

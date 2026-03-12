@@ -1,6 +1,19 @@
+# Block direct IP access on HTTP — return nothing
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
     return 444;
 }
+
+%{ if has_ssl ~}
+# Block direct IP access on HTTPS — return nothing
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    ssl_certificate     /etc/nginx/ssl/certificate.pem;
+    ssl_certificate_key /etc/nginx/ssl/private_key.pem;
+    server_name _;
+    return 444;
+}
+%{ endif ~}

@@ -196,6 +196,9 @@ function getPageSections($arr = false)
 
 function getImage($image, $size = null)
 {
+    if (filter_var($image, FILTER_VALIDATE_URL)) {
+        return $image;
+    }
     $clean = '';
     if (file_exists($image) && is_file($image)) {
         return asset($image) . $clean;
@@ -479,6 +482,9 @@ function convertToReadableSize($size) {
 
 function frontendImage($sectionName, $image, $size = null,$seo = false)
 {
+    if (filter_var($image, FILTER_VALIDATE_URL)) {
+        return $image;
+    }
     if ($seo) {
         return getImage('assets/images/frontend/' . $sectionName . '/seo/' . $image, $size);
     }
