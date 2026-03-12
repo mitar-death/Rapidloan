@@ -59,18 +59,7 @@ class ManualGatewaySeeder extends Seeder
                 'alias' => 'bank_transfer',
                 'status' => Status::ENABLE,
                 'crypto' => 0,
-                'description' => '
-                    <p>Please make your payment to the following bank account:</p>
-                    <ul>
-                        <li><strong>Bank Name:</strong> Global Investment Bank</li>
-                        <li><strong>Account Name:</strong> Your Net Investment Ltd</li>
-                        <li><strong>Account Number:</strong> 1234567890</li>
-                        <li><strong>Sort Code:</strong> 12-34-56</li>
-                        <li><strong>IBAN:</strong> GB12 GIBL 1234 5678 90</li>
-                        <li><strong>SWIFT/BIC:</strong> GIBLGB2L</li>
-                    </ul>
-                    <p><strong>Note:</strong> Please include your username as a reference in the payment to expedite verification.</p>
-                '
+                'description' => '<p>Please make your payment to the following bank account:</p><ul><li><strong>Bank Name:</strong> Global Investment Bank</li><li><strong>Account Name:</strong> Your Net Investment Ltd</li><li><strong>Account Number:</strong> 1234567890</li><li><strong>Sort Code:</strong> 12-34-56</li><li><strong>IBAN:</strong> GB12 GIBL 1234 5678 90</li><li><strong>SWIFT/BIC:</strong> GIBLGB2L</li></ul><p><strong>Note:</strong> Please include your username as a reference in the payment to expedite verification.</p>'
             ]
         );
 
@@ -126,20 +115,7 @@ class ManualGatewaySeeder extends Seeder
                 'alias' => 'bitcoin_manual',
                 'status' => Status::ENABLE,
                 'crypto' => 1,
-                'description' => '
-                    <p>Please send the exact BTC amount to the address below:</p>
-                    <div class="alert alert-info">
-                        <strong>BTC Address:</strong> {addr}
-                    </div>
-                    <p><strong>Instructions:</strong></p>
-                    <ol>
-                        <li>Open your crypto wallet (e.g., Trust Wallet, Binance).</li>
-                        <li>Scan the QR code or copy the address above.</li>
-                        <li>Send the designated amount of Bitcoin (BTC).</li>
-                        <li>Once the transaction is confirmed on the blockchain (usually 1-3 confirmations), provide the details below.</li>
-                    </ol>
-                    <p class="text-danger"><strong>Disclaimer:</strong> Send only BTC to this address. Sending any other coin (including BCH or BSV) may result in permanent loss of funds.</p>
-                '
+                'description' => '<p>Please send the exact BTC amount to the address below:</p><div class="alert alert-info"><strong>BTC Address:</strong> {addr}</div><p><strong>Instructions:</strong></p><ol><li>Open your crypto wallet (e.g., Trust Wallet, Binance).</li><li>Scan the QR code or copy the address above.</li><li>Send the designated amount of Bitcoin (BTC).</li><li>Once the transaction is confirmed on the blockchain (usually 1-3 confirmations), provide the details below.</li></ol><p class="text-danger"><strong>Disclaimer:</strong> Send only BTC to this address. Sending any other coin (including BCH or BSV) may result in permanent loss of funds.</p>'
             ]
         );
 
@@ -195,19 +171,7 @@ class ManualGatewaySeeder extends Seeder
                 'alias' => 'ethereum_manual',
                 'status' => Status::ENABLE,
                 'crypto' => 1,
-                'description' => '
-                    <p>Please send the exact ETH amount to the address below:</p>
-                    <div class="alert alert-info">
-                        <strong>ETH Address:</strong> {addr}
-                    </div>
-                    <p><strong>Instructions:</strong></p>
-                    <ol>
-                        <li>Open your Ethereum wallet (e.g., MetaMask, Ledger).</li>
-                        <li>Ensure you are connected to the <strong>Ethereum Mainnet (ERC-20)</strong>.</li>
-                        <li>Send the exact amount to the address above.</li>
-                    </ol>
-                    <p class="text-danger"><strong>Disclaimer:</strong> Send only ETH to this address. multi-chain transfers (like BSC, Polygon, or Arbitrum) are NOT supported and will lead to loss of funds.</p>
-                '
+                'description' => '<p>Please send the exact ETH amount to the address below:</p><div class="alert alert-info"><strong>ETH Address:</strong> {addr}</div><p><strong>Instructions:</strong></p><ol><li>Open your Ethereum wallet (e.g., MetaMask, Ledger).</li><li>Ensure you are connected to the <strong>Ethereum Mainnet (ERC-20)</strong>.</li><li>Send the exact amount to the address above.</li></ol><p class="text-danger"><strong>Disclaimer:</strong> Send only ETH to this address. multi-chain transfers (like BSC, Polygon, or Arbitrum) are NOT supported and will lead to loss of funds.</p>'
             ]
         );
 

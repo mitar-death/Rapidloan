@@ -29,7 +29,7 @@
                             </ul>
                             <div id="content">
                                 <p>
-                                    @php echo @$blog->data_values->description_nic @endphp
+                                    @php echo __(@$blog->data_values->description_nic) @endphp
                                 </p>
                             </div>
                         </div>

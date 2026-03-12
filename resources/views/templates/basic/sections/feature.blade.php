@@ -20,7 +20,7 @@
                     <h2>{{ __(@$featureContent->data_values->heading) }}</h2>
                     <p class="t-short-para">
                       @php
-                          echo @$featureContent->data_values->content;
+                          echo __(@$featureContent->data_values->content);
                       @endphp
                     </p>
                 </div>

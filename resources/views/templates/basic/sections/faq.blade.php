@@ -40,7 +40,7 @@
                                 data-bs-parent="#faqAccordion">
                                 <div class="accordion-body vf-accordion__body">
                                     @php
-                                        echo @$faq->data_values->answer;
+                                        echo __(@$faq->data_values->answer);
                                     @endphp
                                 </div>
                             </div>
